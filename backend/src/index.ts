@@ -3,6 +3,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { poolPromise } from "./config/db";
 
+import araclarRoutes from "./routes/araclar.routes";
+import hizmetlerRoutes from "./routes/hizmetler.routes";
+import galeriRoutes from "./routes/galeri.routes";
+import rezervasyonlarRoutes from "./routes/rezervasyonlar.routes";
+
 dotenv.config();
 
 const app = express();
@@ -32,6 +37,12 @@ app.get("/test-db", async (req, res) => {
     });
   }
 });
+
+// ROUTES
+app.use("/api/araclar", araclarRoutes);
+app.use("/api/hizmetler", hizmetlerRoutes);
+app.use("/api/galeri", galeriRoutes);
+app.use("/api/rezervasyonlar", rezervasyonlarRoutes);
 
 const PORT = process.env.PORT || 5001;
 
