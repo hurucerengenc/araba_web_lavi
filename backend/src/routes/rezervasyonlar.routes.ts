@@ -109,6 +109,15 @@ router.get("/:id", async (req, res) => {
 /*
   POST /api/rezervasyonlar
   Yeni rezervasyon oluşturur.
+
+  Frontend şu alanları gönderebilir:
+  ad_soyad, telefon, email, hizmet, tarih, saat, notlar
+
+  Backend içinde bunları DB kolonlarına çeviriyoruz:
+  hizmet -> hizmet_id
+  tarih -> rezervasyon_tarihi
+  saat -> rezervasyon_saati
+  notlar -> guzergah_not
 */
 router.post("/", async (req, res) => {
   try {
@@ -116,6 +125,14 @@ router.post("/", async (req, res) => {
       ad_soyad,
       telefon,
       email,
+
+      // Frontend'den gelen basit alanlar
+      hizmet,
+      tarih,
+      saat,
+      notlar,
+
+      // Admin veya başka yerden direkt gelebilecek alanlar
       hizmet_id,
       rezervasyon_tarihi,
       rezervasyon_saati,
@@ -128,14 +145,12 @@ router.post("/", async (req, res) => {
       toplam_fiyat,
     } = req.body;
 
-    if (
-      !ad_soyad ||
-      !telefon ||
-      !email ||
-      !hizmet_id ||
-      !rezervasyon_tarihi ||
-      !rezervasyon_saati
-    ) {
+    const sonHizmetDegeri = hizmet_id || hizmet;
+    const sonTarih = rezervasyon_tarihi || tarih;
+    const sonSaat = rezervasyon_saati || saat;
+    const sonNot = guzergah_not || notlar;
+
+    if (!ad_soyad || !telefon || !email || !sonHizmetDegeri || !sonTarih || !sonSaat) {
       return res.status(400).json({
         message: "Ad soyad, telefon, email, hizmet, tarih ve saat zorunludur.",
       });
@@ -143,21 +158,52 @@ router.post("/", async (req, res) => {
 
     const pool = await poolPromise;
 
+    let sonHizmetId: number | null = null;
+
+    /*
+      Frontend hizmeti yazı olarak gönderiyorsa:
+      "Havalimanı Transferi" gibi.
+      Bunu Hizmetler tablosundan hizmet_id'ye çeviriyoruz.
+    */
+    if (isNaN(Number(sonHizmetDegeri))) {
+      const hizmetResult = await pool
+        .request()
+        .input("hizmet_adi", sql.NVarChar, sonHizmetDegeri)
+        .query(`
+          SELECT TOP 1 hizmet_id
+          FROM dbo.Hizmetler
+          WHERE hizmet_adi = @hizmet_adi
+        `);
+
+      if (hizmetResult.recordset.length === 0) {
+        return res.status(400).json({
+          message:
+            "Seçilen hizmet veritabanında bulunamadı. Hizmetler tablosunda bu hizmet adı olmalı.",
+          gelen_hizmet: sonHizmetDegeri,
+        });
+      }
+
+      sonHizmetId = hizmetResult.recordset[0].hizmet_id;
+    } else {
+      sonHizmetId = Number(sonHizmetDegeri);
+    }
+
     const result = await pool
       .request()
       .input("ad_soyad", sql.NVarChar, ad_soyad)
       .input("telefon", sql.NVarChar, telefon)
       .input("email", sql.NVarChar, email)
-      .input("hizmet_id", sql.Int, Number(hizmet_id))
-      .input("rezervasyon_tarihi", sql.Date, rezervasyon_tarihi)
+      .input("hizmet_id", sql.Int, sonHizmetId)
+      .input("rezervasyon_tarihi", sql.Date, sonTarih)
 
-      // Saat frontend/PowerShell'den string gelir.
-      // sql.Time hata verdiği için VarChar kullanıyoruz.
-      // SQL Server time kolonuna "14:00:00" değerini kendi çevirebilir.
-      .input("rezervasyon_saati", sql.VarChar, rezervasyon_saati)
+      /*
+        Saat frontend'den "20:02" gibi gelir.
+        SQL Server time kolonuna bunu çevirebilir.
+      */
+      .input("rezervasyon_saati", sql.VarChar, sonSaat)
 
       .input("kisi_sayisi", sql.Int, kisi_sayisi ? Number(kisi_sayisi) : 1)
-      .input("guzergah_not", sql.NVarChar, guzergah_not || null)
+      .input("guzergah_not", sql.NVarChar, sonNot || null)
       .input("alis_noktasi", sql.NVarChar, alis_noktasi || null)
       .input("varis_noktasi", sql.NVarChar, varis_noktasi || null)
       .input("arac_id", sql.Int, arac_id ? Number(arac_id) : null)
@@ -251,11 +297,7 @@ router.put("/:id", async (req, res) => {
       .input("email", sql.NVarChar, email || null)
       .input("hizmet_id", sql.Int, hizmet_id ? Number(hizmet_id) : null)
       .input("rezervasyon_tarihi", sql.Date, rezervasyon_tarihi || null)
-
-      // Burası da POST ile aynı şekilde VarChar olmalı.
-      // Yoksa rezervasyon güncellerken yine Invalid time hatası verir.
       .input("rezervasyon_saati", sql.VarChar, rezervasyon_saati || null)
-
       .input("kisi_sayisi", sql.Int, kisi_sayisi ? Number(kisi_sayisi) : null)
       .input("guzergah_not", sql.NVarChar, guzergah_not || null)
       .input("durum", sql.NVarChar, durum || null)
