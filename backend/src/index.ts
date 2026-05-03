@@ -1,8 +1,11 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import helmet from "helmet";
+
 import { poolPromise } from "./config/db";
 
+import adminRoutes from "./routes/admin.routes";
 import araclarRoutes from "./routes/araclar.routes";
 import hizmetlerRoutes from "./routes/hizmetler.routes";
 import galeriRoutes from "./routes/galeri.routes";
@@ -12,8 +15,36 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+/*
+  Helmet:
+  Backend'e güvenlik HTTP header'ları ekler.
+  Örneğin bazı XSS, clickjacking gibi temel web açıklarına karşı ek koruma sağlar.
+*/
+app.use(helmet());
+
+/*
+  CORS:
+  Backend'e hangi frontend adresinin istek atabileceğini belirliyoruz.
+  Vite React projesi genelde http://localhost:5173 üzerinde çalışır.
+*/
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
+/*
+  JSON limit:
+  Çok büyük body gönderilmesini engeller.
+  Form verileri için 1mb fazlasıyla yeterli.
+*/
+app.use(
+  express.json({
+    limit: "1mb",
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Araç kiralama backend çalışıyor 🚗");
@@ -31,6 +62,7 @@ app.get("/test-db", async (req, res) => {
     });
   } catch (error) {
     console.error("DB test hatası:", error);
+
     res.status(500).json({
       message: "Veritabanı bağlantısı başarısız",
       error,
@@ -43,6 +75,7 @@ app.use("/api/araclar", araclarRoutes);
 app.use("/api/hizmetler", hizmetlerRoutes);
 app.use("/api/galeri", galeriRoutes);
 app.use("/api/rezervasyonlar", rezervasyonlarRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5001;
 
