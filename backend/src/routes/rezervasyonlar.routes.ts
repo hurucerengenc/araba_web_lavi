@@ -1,6 +1,7 @@
 import express from "express";
 import sql from "mssql";
 import { poolPromise } from "../config/db";
+import { adminAuth } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
@@ -27,7 +28,7 @@ router.get("/", async (req, res) => {
         r.alis_noktasi,
         r.varis_noktasi,
         r.arac_id,
-       a.arac_adi,
+        a.arac_adi,
         r.durum,
         r.odeme_durumu,
         r.toplam_fiyat,
@@ -149,7 +150,12 @@ router.post("/", async (req, res) => {
       .input("email", sql.NVarChar, email)
       .input("hizmet_id", sql.Int, Number(hizmet_id))
       .input("rezervasyon_tarihi", sql.Date, rezervasyon_tarihi)
-      .input("rezervasyon_saati", sql.Time, rezervasyon_saati)
+
+      // Saat frontend/PowerShell'den string gelir.
+      // sql.Time hata verdiği için VarChar kullanıyoruz.
+      // SQL Server time kolonuna "14:00:00" değerini kendi çevirebilir.
+      .input("rezervasyon_saati", sql.VarChar, rezervasyon_saati)
+
       .input("kisi_sayisi", sql.Int, kisi_sayisi ? Number(kisi_sayisi) : 1)
       .input("guzergah_not", sql.NVarChar, guzergah_not || null)
       .input("alis_noktasi", sql.NVarChar, alis_noktasi || null)
@@ -245,7 +251,11 @@ router.put("/:id", async (req, res) => {
       .input("email", sql.NVarChar, email || null)
       .input("hizmet_id", sql.Int, hizmet_id ? Number(hizmet_id) : null)
       .input("rezervasyon_tarihi", sql.Date, rezervasyon_tarihi || null)
-      .input("rezervasyon_saati", sql.Time, rezervasyon_saati || null)
+
+      // Burası da POST ile aynı şekilde VarChar olmalı.
+      // Yoksa rezervasyon güncellerken yine Invalid time hatası verir.
+      .input("rezervasyon_saati", sql.VarChar, rezervasyon_saati || null)
+
       .input("kisi_sayisi", sql.Int, kisi_sayisi ? Number(kisi_sayisi) : null)
       .input("guzergah_not", sql.NVarChar, guzergah_not || null)
       .input("durum", sql.NVarChar, durum || null)
@@ -299,7 +309,7 @@ router.put("/:id", async (req, res) => {
   PATCH /api/rezervasyonlar/:id/durum
   Sadece rezervasyon durumunu günceller.
 */
-router.patch("/:id/durum", async (req, res) => {
+router.patch("/:id/durum", adminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { durum } = req.body;
@@ -347,7 +357,7 @@ router.patch("/:id/durum", async (req, res) => {
   DELETE /api/rezervasyonlar/:id
   Rezervasyonu siler.
 */
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", adminAuth, async (req, res) => {
   try {
     const { id } = req.params;
 
