@@ -38,6 +38,7 @@ import galeri6 from './assets/images/besincikisim6.JPG';
 
 function App() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,14 +65,21 @@ function App() {
                   <div className="logo-text">VIP KAYSERİ</div>
                   <div className="logo-subtext">LUXURY TRANSPORTATION</div>
                 </div>
-                <ul className="nav-menu">
-                  <li><a href="#araclar">ARAÇLARIMIZ</a></li>
-                  <li><a href="#hizmetler">HİZMETLER</a></li>
-                  <li><a href="#galeri">GALERİ</a></li>
-                  <li><a href="#iletisim">İLETİŞİM</a></li>
+                {/* HAMBURGER ICON */}
+                <div className="hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                  <div className={`line ${isMobileMenuOpen ? 'open' : ''}`}></div>
+                  <div className={`line ${isMobileMenuOpen ? 'open' : ''}`}></div>
+                  <div className={`line ${isMobileMenuOpen ? 'open' : ''}`}></div>
+                </div>
+
+                <ul className={`nav-menu ${isMobileMenuOpen ? 'active' : ''}`}>
+                  <li><a href="#araclar" onClick={() => setIsMobileMenuOpen(false)}>ARAÇLARIMIZ</a></li>
+                  <li><a href="#hizmetler" onClick={() => setIsMobileMenuOpen(false)}>HİZMETLER</a></li>
+                  <li><a href="#galeri" onClick={() => setIsMobileMenuOpen(false)}>GALERİ</a></li>
+                  <li><a href="#iletisim" onClick={() => setIsMobileMenuOpen(false)}>İLETİŞİM</a></li>
                 </ul>
-                <div className="header-actions">
-                  <a href="#iletisim">
+                <div className={`header-actions ${isMobileMenuOpen ? 'active' : ''}`}>
+                  <a href="#iletisim" onClick={() => setIsMobileMenuOpen(false)}>
                     <button className="rez-btn-top">REZERVASYON YAP →</button>
                   </a>
                 </div>
