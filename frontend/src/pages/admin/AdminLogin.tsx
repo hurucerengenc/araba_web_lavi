@@ -1,31 +1,43 @@
 import React, { useState } from 'react';
 
-
 interface AdminLoginProps {
   onLogin: (token: string) => void;
 }
 
 const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [sifre, setSifre] = useState('');
   const [error, setError] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+
     try {
-      // Mock logic as instructed (frontend only)
-      // Real code would be:
-      // const res = await api.post('/admin/login', { email, password });
-      // const token = res.data.token;
-      
-      if (email === 'admin@vipkayseri.com' && password === 'admin123') {
-        const fakeToken = "mock_admin_token_123";
-        onLogin(fakeToken);
-      } else {
-        throw new Error('Email veya şifre hatalı');
+      const response = await fetch('http://localhost:5001/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          sifre: sifre,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || 'Email veya şifre hatalı');
+        return;
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message || 'Email veya şifre hatalı');
+
+      localStorage.setItem('adminToken', data.token);
+      localStorage.setItem('adminBilgi', JSON.stringify(data.admin));
+
+      onLogin(data.token);
+    } catch (err) {
+      setError('Sunucuya bağlanırken hata oluştu.');
     }
   };
 
@@ -33,24 +45,28 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
     <div style={styles.container}>
       <div style={styles.card}>
         <h2 style={styles.title}>Admin Girişi</h2>
+
         {error && <p style={styles.error}>{error}</p>}
+
         <form onSubmit={handleLogin} style={styles.form}>
           <input
             type="email"
-            placeholder="Email (admin@vipkayseri.com)"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             style={styles.input}
             required
           />
+
           <input
             type="password"
-            placeholder="Şifre (admin123)"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Şifre"
+            value={sifre}
+            onChange={(e) => setSifre(e.target.value)}
             style={styles.input}
             required
           />
+
           <button type="submit" style={styles.button}>GİRİŞ YAP</button>
         </form>
       </div>
