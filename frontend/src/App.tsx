@@ -47,7 +47,7 @@ function App() {
     email: '',
     tarih: '',
     saat: '',
-    hizmet: '',
+    hizmet_id: '',
     notlar: '',
   });
 
@@ -96,7 +96,7 @@ function App() {
       !reservationForm.email ||
       !reservationForm.tarih ||
       !reservationForm.saat ||
-      !reservationForm.hizmet
+      !reservationForm.hizmet_id
     ) {
       setReservationMessage(
         'Lütfen ad soyad, telefon, e-posta, tarih, saat ve hizmet alanlarını doldurun.'
@@ -132,7 +132,7 @@ function App() {
         email: '',
         tarih: '',
         saat: '',
-        hizmet: '',
+        hizmet_id: '',
         notlar: '',
       });
     } catch (error) {
@@ -555,19 +555,19 @@ function App() {
                       />
                     </div>
 
-                    <select
-                      name="hizmet"
-                      value={reservationForm.hizmet}
-                      onChange={handleReservationChange}
-                    >
-                      <option value="" disabled>
-                        HİZMET TÜRÜ SEÇİN...
-                      </option>
-                      <option value="Havalimanı Transferi">Havalimanı Transferi</option>
-                      <option value="Kapadokya Özel Turu">Kapadokya Özel Turu</option>
-                      <option value="Şehirlerarası Transfer">Şehirlerarası Transfer</option>
-                      <option value="Kurumsal Protokol">Kurumsal Protokol</option>
-                    </select>
+                 <select
+  name="hizmet_id"
+  value={reservationForm.hizmet_id}
+  onChange={handleReservationChange}
+>
+  <option value="" disabled>
+    HİZMET TÜRÜ SEÇİN...
+  </option>
+  <option value={1}>Havalimanı Transferi</option>
+  <option value={2}>Kapadokya Özel Turu</option>
+  <option value={3}>Şehirlerarası Transfer</option>
+  <option value={4}>Kurumsal Protokol</option>
+</select>
 
                     <textarea
                       name="notlar"
