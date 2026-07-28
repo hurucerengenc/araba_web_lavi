@@ -4,7 +4,9 @@
   "description": "��\r\u0000 \u0000",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc", 
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
