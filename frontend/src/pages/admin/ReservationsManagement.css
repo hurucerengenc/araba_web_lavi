@@ -1,0 +1,135 @@
+/* src/pages/admin/ReservationsManagement.css */
+.admin-reservations {
+  animation: fadeIn var(--transition-normal);
+}
+
+.admin-table-container {
+  overflow-x: auto;
+  border-radius: var(--radius-xl);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 1000px;
+  text-align: left;
+}
+
+.admin-table th {
+  padding: var(--spacing-4) var(--spacing-6);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.admin-table td {
+  padding: var(--spacing-4) var(--spacing-6);
+  font-size: var(--text-sm);
+  border-bottom: 1px solid var(--color-border);
+  background-color: transparent;
+  transition: background-color var(--transition-fast);
+}
+
+.admin-table tbody tr {
+  transition: all var(--transition-fast);
+}
+
+.admin-table tbody tr:hover td {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* User Info Cell */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.user-contact {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* Service Info Cell */
+.service-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.service-name {
+  color: var(--color-text-primary);
+}
+
+.service-car {
+  font-size: var(--text-xs);
+  color: var(--color-gold-500);
+}
+
+/* Route Info Cell */
+.route-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.route-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--text-xs);
+}
+
+.route-label {
+  color: var(--color-text-muted);
+  font-weight: 500;
+  min-width: 40px;
+}
+
+.route-value {
+  color: var(--color-text-secondary);
+}
+
+/* Status Change Container */
+.status-action {
+  width: 140px;
+}
+
+/* Empty State */
+.admin-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-16) 0;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.admin-empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--spacing-4);
+  opacity: 0.5;
+}
+
+/* Actions Header Row */
+.admin-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-6);
+}

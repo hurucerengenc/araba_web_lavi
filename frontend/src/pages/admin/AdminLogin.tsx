@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import '../../styles/animations.css';
+import './AdminLogin.css';
 
 interface AdminLoginProps {
   onLogin: (token: string) => void;
@@ -8,10 +12,12 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [sifre, setSifre] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
     try {
       const response = await fetch('http://localhost:5001/api/admin/login', {
@@ -37,95 +43,61 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLogin }) => {
 
       onLogin(data.token);
     } catch (err) {
-      setError('Sunucuya bağlanırken hata oluştu.');
+      setError('Sunucuya bağlanırken hata oluştu. Lütfen bağlantınızı kontrol edin.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h2 style={styles.title}>Admin Girişi</h2>
+    <div className="admin-login-container">
+      <div className="admin-login-card glass-panel">
+        <div className="admin-login-header">
+          <h2 className="admin-login-title text-gradient-gold">VIP KAYSERİ</h2>
+          <p className="admin-login-subtitle">Yönetim Paneli Girişi</p>
+        </div>
 
-        {error && <p style={styles.error}>{error}</p>}
+        {error && <div className="admin-login-error">{error}</div>}
 
-        <form onSubmit={handleLogin} style={styles.form}>
-          <input
+        <form onSubmit={handleLogin} className="admin-login-form">
+          <Input
             type="email"
-            placeholder="Email"
+            label="E-posta Adresi"
+            placeholder="admin@vipkayseri.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={styles.input}
             required
+            autoComplete="email"
           />
 
-          <input
+          <Input
             type="password"
-            placeholder="Şifre"
+            label="Şifre"
+            placeholder="••••••••"
             value={sifre}
             onChange={(e) => setSifre(e.target.value)}
-            style={styles.input}
             required
+            autoComplete="current-password"
           />
 
-          <button type="submit" style={styles.button}>GİRİŞ YAP</button>
+          <Button 
+            type="submit" 
+            variant="primary" 
+            size="lg" 
+            fullWidth 
+            isLoading={isLoading}
+            style={{ marginTop: '0.5rem' }}
+          >
+            SİSTEME GİRİŞ YAP
+          </Button>
         </form>
+
+        <div className="admin-login-footer">
+          &copy; {new Date().getFullYear()} VIP Kayseri. Tüm hakları saklıdır.
+        </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  container: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100vh',
-    backgroundColor: '#0a0a0a',
-    color: 'white',
-    fontFamily: "'Montserrat', sans-serif"
-  },
-  card: {
-    backgroundColor: '#111',
-    padding: '40px',
-    borderRadius: '8px',
-    border: '1px solid #222',
-    width: '100%',
-    maxWidth: '400px',
-    textAlign: 'center' as const
-  },
-  title: {
-    fontFamily: "'Cormorant Garamond', serif",
-    fontSize: '32px',
-    marginBottom: '20px',
-    fontWeight: 300,
-  },
-  error: {
-    color: '#ff4d4f',
-    marginBottom: '15px',
-    fontSize: '14px',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column' as const,
-    gap: '15px',
-  },
-  input: {
-    padding: '15px',
-    backgroundColor: '#050505',
-    border: '1px solid #333',
-    color: 'white',
-    fontSize: '14px',
-    outline: 'none',
-  },
-  button: {
-    padding: '15px',
-    backgroundColor: '#C5A059',
-    color: '#000',
-    border: 'none',
-    fontWeight: 700,
-    cursor: 'pointer',
-    marginTop: '10px',
-  }
 };
 
 export default AdminLogin;

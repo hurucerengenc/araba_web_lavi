@@ -1,0 +1,31 @@
+/* src/components/ui/Select.css */
+.ui-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.ui-select option {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  padding: 10px;
+}
+
+.ui-select-arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
+}
+
+.ui-select:focus + .ui-select-arrow {
+  color: var(--color-gold-500);
+}

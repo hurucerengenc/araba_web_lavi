@@ -1,4 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { Badge } from '../../components/ui/Badge';
+import { Modal } from '../../components/ui/Modal';
+// Using the same table CSS from Reservations for consistency
+import './ReservationsManagement.css'; 
 
 const VehiclesManagement = () => {
   const [vehicles, setVehicles] = useState([
@@ -7,93 +13,124 @@ const VehiclesManagement = () => {
   const [showModal, setShowModal] = useState(false);
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Bu aracı silmek/pasif yapmak istediğinize emin misiniz?')) {
-      // await api.delete(`/admin/vehicles/${id}`);
+    if (window.confirm('Bu aracı silmek veya pasif yapmak istediğinize emin misiniz?')) {
       setVehicles(vehicles.filter(v => v.id !== id));
-      alert('Araç silindi.');
+      // alert('Araç silindi.');
     }
   };
 
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowModal(false);
+  };
+
   return (
-    <div>
-      <div style={styles.header}>
-        <h2>Araç Yönetimi</h2>
-        <button style={styles.addBtn} onClick={() => setShowModal(true)}>+ Yeni Araç Ekle</button>
+    <div className="admin-reservations">
+      <div className="admin-page-header">
+        <div>
+          <h2 className="admin-page-title text-gradient-gold">Araç Yönetimi</h2>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-sm)' }}>
+            Filodaki araçları yönetin, kapasiteleri belirleyin ve araç durumlarını güncelleyin.
+          </p>
+        </div>
+        <Button variant="primary" onClick={() => setShowModal(true)}>
+          + Yeni Araç Ekle
+        </Button>
       </div>
       
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th style={styles.th}>Ad</th>
-            <th style={styles.th}>Marka</th>
-            <th style={styles.th}>Model</th>
-            <th style={styles.th}>Kapasite</th>
-            <th style={styles.th}>Durum</th>
-            <th style={styles.th}>İşlem</th>
-          </tr>
-        </thead>
-        <tbody>
-          {vehicles.map(v => (
-            <tr key={v.id}>
-              <td style={styles.td}>{v.name}</td>
-              <td style={styles.td}>{v.brand}</td>
-              <td style={styles.td}>{v.model}</td>
-              <td style={styles.td}>{v.pax} Kişi</td>
-              <td style={styles.td}>
-                <span style={v.status === 'active' ? styles.statusActive : styles.statusInactive}>
-                  {v.status === 'active' ? 'Aktif' : 'Pasif'}
-                </span>
-              </td>
-              <td style={styles.td}>
-                <button style={styles.actionBtn}>Düzenle</button>
-                <button style={{...styles.actionBtn, color: '#ff4d4f'}} onClick={() => handleDelete(v.id)}>Sil</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      {showModal && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modal}>
-            <h3>Yeni Araç Ekle</h3>
-            <form style={styles.form}>
-              <input type="text" placeholder="Araç Adı" style={styles.input} />
-              <input type="text" placeholder="Marka" style={styles.input} />
-              <input type="text" placeholder="Model" style={styles.input} />
-              <input type="number" placeholder="Kişi Kapasitesi" style={styles.input} />
-              <input type="number" placeholder="Bagaj Kapasitesi" style={styles.input} />
-              <textarea placeholder="Açıklama" style={styles.textarea}></textarea>
-              <input type="text" placeholder="Resim Yolu / URL" style={styles.input} />
-              <div style={styles.modalActions}>
-                <button type="button" onClick={() => setShowModal(false)} style={styles.cancelBtn}>İptal</button>
-                <button type="submit" style={styles.saveBtn}>Kaydet</button>
-              </div>
-            </form>
-          </div>
+      <div className="admin-panel-card glass-panel">
+        <div className="admin-table-container">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Ad</th>
+                <th>Marka / Model</th>
+                <th>Kapasite</th>
+                <th>Durum</th>
+                <th style={{ textAlign: 'right' }}>İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {vehicles.map(v => (
+                <tr key={v.id}>
+                  <td>
+                    <span style={{ fontWeight: 500, color: 'var(--color-text-primary)' }}>{v.name}</span>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ color: 'var(--color-text-secondary)' }}>{v.brand}</span>
+                      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-gold-500)' }}>{v.model}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span style={{ color: 'var(--color-text-secondary)' }}>{v.pax} Yolcu</span>
+                      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-muted)' }}>{v.luggage} Bagaj</span>
+                    </div>
+                  </td>
+                  <td>
+                    <Badge variant={v.status === 'active' ? 'success' : 'error'}>
+                      {v.status === 'active' ? 'Aktif' : 'Pasif'}
+                    </Badge>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                      <Button variant="ghost" size="sm" onClick={() => setShowModal(true)}>Düzenle</Button>
+                      <Button variant="ghost" size="sm" style={{ color: 'var(--color-error)' }} onClick={() => handleDelete(v.id)}>Sil</Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {vehicles.length === 0 && (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: 'var(--spacing-8)', color: 'var(--color-text-muted)' }}>
+                    Kayıtlı araç bulunamadı.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+      </div>
+
+      <Modal 
+        isOpen={showModal} 
+        onClose={() => setShowModal(false)} 
+        title="Araç Ekle / Düzenle"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setShowModal(false)}>İptal</Button>
+            <Button variant="primary" onClick={handleSave}>Kaydet</Button>
+          </>
+        }
+      >
+        <form id="vehicle-form" onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-4)' }}>
+          <Input type="text" label="Araç Adı" placeholder="Örn: Mercedes Maybach" required />
+          
+          <div style={{ display: 'flex', gap: 'var(--spacing-4)' }}>
+            <Input type="text" label="Marka" placeholder="Örn: Mercedes-Benz" required />
+            <Input type="text" label="Model" placeholder="Örn: V-Serisi" required />
+          </div>
+          
+          <div style={{ display: 'flex', gap: 'var(--spacing-4)' }}>
+            <Input type="number" label="Yolcu Kapasitesi" placeholder="Örn: 7" required />
+            <Input type="number" label="Bagaj Kapasitesi" placeholder="Örn: 5" required />
+          </div>
+          
+          <div className="ui-input-wrapper">
+            <label className="ui-input-label">Açıklama</label>
+            <textarea 
+              className="ui-input" 
+              placeholder="Araç özellikleri hakkında bilgi..."
+              style={{ minHeight: '100px', resize: 'vertical' }}
+            />
+          </div>
+          
+          <Input type="text" label="Görsel URL" placeholder="https://..." />
+        </form>
+      </Modal>
     </div>
   );
-};
-
-const styles = {
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' },
-  addBtn: { backgroundColor: '#C5A059', color: '#000', border: 'none', padding: '10px 20px', fontWeight: 'bold', cursor: 'pointer', borderRadius: '4px' },
-  table: { width: '100%', borderCollapse: 'collapse' as const, backgroundColor: '#111', borderRadius: '8px', overflow: 'hidden' },
-  th: { padding: '15px', textAlign: 'left' as const, borderBottom: '1px solid #222', color: '#888', fontSize: '13px' },
-  td: { padding: '15px', borderBottom: '1px solid #222', fontSize: '14px' },
-  actionBtn: { background: 'transparent', border: 'none', color: '#C5A059', cursor: 'pointer', marginRight: '15px' },
-  statusActive: { backgroundColor: 'rgba(37, 211, 102, 0.1)', color: '#25D366', padding: '5px 10px', borderRadius: '20px', fontSize: '12px' },
-  statusInactive: { backgroundColor: 'rgba(255, 77, 79, 0.1)', color: '#ff4d4f', padding: '5px 10px', borderRadius: '20px', fontSize: '12px' },
-  modalOverlay: { position: 'fixed' as const, top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
-  modal: { backgroundColor: '#111', padding: '30px', borderRadius: '8px', width: '500px', border: '1px solid #222' },
-  form: { display: 'flex', flexDirection: 'column' as const, gap: '15px', marginTop: '20px' },
-  input: { padding: '12px', backgroundColor: '#050505', border: '1px solid #333', color: 'white', borderRadius: '4px' },
-  textarea: { padding: '12px', backgroundColor: '#050505', border: '1px solid #333', color: 'white', borderRadius: '4px', height: '80px', resize: 'none' as const },
-  modalActions: { display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' },
-  cancelBtn: { padding: '10px 20px', background: 'transparent', color: 'white', border: '1px solid #444', cursor: 'pointer', borderRadius: '4px' },
-  saveBtn: { padding: '10px 20px', background: '#C5A059', color: '#000', border: 'none', cursor: 'pointer', fontWeight: 'bold', borderRadius: '4px' }
 };
 
 export default VehiclesManagement;
