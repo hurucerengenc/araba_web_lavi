@@ -18,7 +18,13 @@ const PORT = process.env.PORT || 5001;
 // 1. CORS Middleware (Frontend isteklerine izin ver)
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: (origin, callback) => {
+      if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS: Bu origin'e izin verilmiyor."));
+      }
+    },
     credentials: true,
   })
 );
