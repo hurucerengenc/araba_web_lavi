@@ -216,7 +216,7 @@ function App() {
 
 
 
-      const response = await fetch('http://localhost:5001/api/rezervasyonlar', {
+     const response = await fetch('https://araba-web-lavi.onrender.com/api/rezervasyonlar', {
 
         method: 'POST',
 
