@@ -16,10 +16,16 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // 1. CORS Middleware (Frontend isteklerine izin ver)
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) {
+      // Localhost, Vercel ve origin olmayan (Postman vb.) tüm isteklere izin ver
+      if (
+        !origin || 
+        /^http:\/\/localhost:\d+$/.test(origin) || 
+        origin.endsWith(".vercel.app")
+      ) {
         callback(null, true);
       } else {
         callback(new Error("CORS: Bu origin'e izin verilmiyor."));
